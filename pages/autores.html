@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestión de Autores del catálogo de BookStore. Añade, edita o elimina autores.">
+  <title>Autores - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title"> Gestión de Autores</h1>
+        <p class="section-subtitle">Registra y administra los autores de tu catálogo bibliográfico.</p>
+      </header>
+
+      <!-- Panel de Registro -->
+      <section class="form-panel">
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 15px;">Registrar Autor</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" class="form-input" placeholder="Ej. Gabriel" autocomplete="off">
+          </div>
+          
+          <div class="form-group">
+            <label for="apellido">Apellido</label>
+            <input type="text" id="apellido" class="form-input" placeholder="Ej. García Márquez" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="nacionalidad">Nacionalidad</label>
+            <input type="text" id="nacionalidad" class="form-input" placeholder="Ej. Colombiana" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="fechaNacimiento">Fecha de Nacimiento</label>
+            <input type="date" id="fechaNacimiento" class="form-input">
+          </div>
+
+          <button class="btn btn-primary" onclick="agregarAutor()" id="btnAgregarAutor" style="height: 42px;">
+            <span></span> Registrar
+          </button>
+        </div>
+      </section>
+
+      <!-- Barra de Filtros y Búsqueda -->
+      <section class="filter-bar">
+        <div class="search-input-wrapper">
+          <input type="text" id="buscarAutor" class="form-input" placeholder=" Buscar autor por nombre o nacionalidad..." oninput="mostrarAutores()">
+        </div>
+      </section>
+
+      <!-- Tabla de Autores -->
+      <section>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre Completo</th>
+                  <th>Nacionalidad</th>
+                  <th>Fecha Nacimiento</th>
+                  <th style="text-align: center;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tablaAutores">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="sinAutores" class="empty-state" style="display: none;">
+          <span class="empty-state-icon"></span>
+          <p class="empty-state-text">No se encontraron autores en el sistema.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal de Edición de Autores -->
+  <div id="modalEdicionAutor" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3 class="modal-title"> Editar Autor</h3>
+        <button class="modal-close" onclick="cerrarModal()">&times;</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <input type="hidden" id="editIndex">
+        
+        <div class="form-group">
+          <label for="editNombre">Nombre</label>
+          <input type="text" id="editNombre" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label for="editApellido">Apellido</label>
+          <input type="text" id="editApellido" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="editNacionalidad">Nacionalidad</label>
+          <input type="text" id="editNacionalidad" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="editFechaNac">Fecha de Nacimiento</label>
+          <input type="date" id="editFechaNac" class="form-input">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarEdicion()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/autores.js"></script>
+</body>
+</html>

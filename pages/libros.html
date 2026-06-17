@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestión de Libros en el catálogo de BookStore. Permite agregar, editar, buscar y eliminar libros.">
+  <title>Libros - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title">Gestión de Libros</h1>
+        <p class="section-subtitle">Administra los títulos, precios, autores, editoriales y existencias de tu inventario.</p>
+      </header>
+
+      <!-- Panel de Registro -->
+      <section class="form-panel">
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 15px;">Registrar Nuevo Libro</h2>
+        <div class="form-row">
+          <div class="form-group" style="flex: 2; min-width: 250px;">
+            <label for="titulo">Título del Libro</label>
+            <input type="text" id="titulo" class="form-input" placeholder="Ej. Cien años de soledad" autocomplete="off">
+          </div>
+          
+          <div class="form-group">
+            <label for="isbn">ISBN</label>
+            <input type="text" id="isbn" class="form-input" placeholder="Ej. 9789585118010" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="selectAutor">Autor</label>
+            <select id="selectAutor" class="form-select">
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="selectEditorial">Editorial</label>
+            <select id="selectEditorial" class="form-select">
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="selectCategoria">Categoría</label>
+            <select id="selectCategoria" class="form-select">
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group" style="min-width: 100px;">
+            <label for="precio">Precio ($)</label>
+            <input type="number" id="precio" class="form-input" placeholder="0.00" min="0.01" step="0.01">
+          </div>
+
+          <div class="form-group" style="min-width: 100px;">
+            <label for="stock">Stock Inicial</label>
+            <input type="number" id="stock" class="form-input" placeholder="0" min="0" step="1">
+          </div>
+
+          <button class="btn btn-primary" onclick="agregarLibro()" id="btnAgregarLibro" style="height: 42px;">
+            <span></span> Registrar
+          </button>
+        </div>
+      </section>
+
+      <!-- Barra de Filtros y Búsqueda -->
+      <section class="filter-bar">
+        <div class="filter-group">
+          <div class="search-input-wrapper">
+            <input type="text" id="buscarLibro" class="form-input" placeholder="Buscar por título o ISBN..." oninput="filtrarLibros()">
+          </div>
+          
+          <select id="filtroCategoria" class="form-select" onchange="filtrarLibros()" style="min-width: 160px; padding: 8px 12px; font-size: 0.85rem;">
+            <!-- Cargado dinámicamente -->
+          </select>
+        </div>
+        
+        <button class="btn btn-secondary btn-small" onclick="limpiarFiltros()" title="Restablecer filtros">
+          Restablecer Filtros
+        </button>
+      </section>
+
+      <!-- Tabla de Libros -->
+      <section>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Título</th>
+                  <th>ISBN</th>
+                  <th>Autor</th>
+                  <th>Editorial</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Stock</th>
+                  <th>Estado</th>
+                  <th style="text-align: center;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tablaLibros">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="sinLibros" class="empty-state" style="display: none;">
+          <span class="empty-state-icon"></span>
+          <p class="empty-state-text">No se encontraron libros que coincidan con la búsqueda.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal de Edición de Libros -->
+  <div id="modalEdicionLibro" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Libro</h3>
+        <button class="modal-close" onclick="cerrarModal()">&times;</button>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <input type="hidden" id="editIndex">
+        
+        <div class="form-group" style="grid-column: span 2;">
+          <label for="editTitulo">Título del Libro</label>
+          <input type="text" id="editTitulo" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label for="editIsbn">ISBN</label>
+          <input type="text" id="editIsbn" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="editAutor">Autor</label>
+          <select id="editAutor" class="form-select">
+            <!-- Cargado dinámicamente -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editEditorial">Editorial</label>
+          <select id="editEditorial" class="form-select">
+            <!-- Cargado dinámicamente -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editCategoria">Categoría</label>
+          <select id="editCategoria" class="form-select">
+            <!-- Cargado dinámicamente -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editPrecio">Precio ($)</label>
+          <input type="number" id="editPrecio" class="form-input" min="0.01" step="0.01">
+        </div>
+
+        <div class="form-group">
+          <label for="editStock">Stock</label>
+          <input type="number" id="editStock" class="form-input" min="0" step="1">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarEdicion()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/libros.js"></script>
+</body>
+</html>

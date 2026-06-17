@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Control de Inventario de BookStore. Registro de entradas, salidas y alertas de stock bajo.">
+  <title>Inventario - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title">Control de Inventario</h1>
+        <p class="section-subtitle">Gestiona las entradas y salidas manuales de libros, y supervisa niveles críticos de stock.</p>
+      </header>
+
+      <!-- Fila superior: Formulario de ajuste rápido y Alerta roja -->
+      <section style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" id="inventarioRow">
+        <!-- Formulario de Movimiento -->
+        <div class="form-panel" style="padding: 20px;">
+          <h3 class="section-title" style="font-size: 1.15rem; margin-bottom: 12px;">Ajustar Stock Manualmente</h3>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="form-group">
+              <label for="selectLibro">Seleccionar Libro</label>
+              <select id="selectLibro" class="form-select" onchange="mostrarStockActual()">
+                <!-- Cargado dinámicamente -->
+              </select>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+              <div class="form-group">
+                <label for="tipoAjuste">Tipo de Ajuste</label>
+                <select id="tipoAjuste" class="form-select">
+                  <option value="Entrada">📥 Entrada (Compra / Devolución)</option>
+                  <option value="Salida">📤 Salida (Pérdida / Ajuste)</option>
+                </select>
+              </div>
+              <div class="form-group" style="max-width: 120px;">
+                <label for="cantidadStock">Cantidad</label>
+                <input type="number" id="cantidadStock" class="form-input" min="1" value="5">
+              </div>
+            </div>
+
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">
+              Stock actual: <strong id="stockActualLabel" style="color: var(--text-main);">0 uds</strong>
+            </div>
+
+            <button class="btn btn-primary" onclick="registrarAjuste()" style="width: 100%;">
+              Guardar Ajuste
+            </button>
+          </div>
+        </div>
+
+        <!-- Alertas de Stock Bajo -->
+        <div class="card" style="border-color: rgba(239, 68, 68, 0.2); padding: 20px;">
+          <h3 class="section-title" style="font-size: 1.15rem; margin-bottom: 12px; color: var(--danger);">Alerta Roja: Stock Crítico (&lt; 5 Unidades)</h3>
+          <div style="max-height: 180px; overflow-y: auto;">
+            <ul id="listaAlertas" style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+              <!-- Inyectado dinámicamente -->
+            </ul>
+          </div>
+          <div id="sinAlertas" class="empty-state" style="display: none; padding: 20px 0;">
+            <p class="empty-state-text" style="color: var(--success); font-size: 0.85rem;"> No hay alertas críticas de stock.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabla de Existencias -->
+      <section>
+        <h3 class="section-title" style="font-size: 1.25rem; margin-bottom: 15px;">Listado General de Existencias</h3>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Libro</th>
+                  <th>ISBN</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Stock Actual</th>
+                  <th>Estado</th>
+                  <th style="text-align: center;">Indicador Alerta</th>
+                </tr>
+              </thead>
+              <tbody id="tablaInventario">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Historial de Movimientos -->
+      <section class="card" style="padding: 20px;">
+        <h3 class="section-title" style="font-size: 1.15rem; margin-bottom: 12px;">Historial de Movimientos de Inventario</h3>
+        <div id="historialMovimientos" class="log-list">
+          <!-- Movimientos inyectados -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <!-- Controlador Inline para respetar la estructura exacta solicitada por el usuario -->
+  <script>
+    // Inicializar barra lateral
+    renderSidebar('inventario', '../');
+
+    let libros = getLocalStorage("libros");
+    let historial = getLocalStorage("inventarioHistorial") || [];
+
+    // Inicializar página
+    cargarLibrosSelect();
+    mostrarInventario();
+
+    function cargarLibrosSelect() {
+      libros = getLocalStorage("libros");
+      const select = document.getElementById("selectLibro");
+      if (libros.length === 0) {
+        select.innerHTML = `<option value="">Sin Libros Registrados</option>`;
+      } else {
+        select.innerHTML = libros.map(l => `<option value="${l.id}">${l.titulo}</option>`).join('');
+      }
+      mostrarStockActual();
+    }
+
+    function mostrarStockActual() {
+      libros = getLocalStorage("libros");
+      const id = document.getElementById("selectLibro").value;
+      const label = document.getElementById("stockActualLabel");
+      if (!id) {
+        label.innerText = "0 uds";
+        return;
+      }
+      const libro = libros.find(l => String(l.id) === String(id));
+      if (libro) {
+        label.innerText = `${libro.stock} uds`;
+      }
+    }
+
+    // Registrar ajuste manual (Entrada/Salida)
+    function registrarAjuste() {
+      libros = getLocalStorage("libros");
+      historial = getLocalStorage("inventarioHistorial") || [];
+
+      const libroId = document.getElementById("selectLibro").value;
+      const tipo = document.getElementById("tipoAjuste").value;
+      const cant = parseInt(document.getElementById("cantidadStock").value || 0);
+
+      if (!libroId || libroId === "") {
+        showToast("Seleccione un libro para realizar el ajuste.", "warning");
+        return;
+      }
+
+      if (isNaN(cant) || cant <= 0) {
+        showToast("Ingrese una cantidad válida mayor a cero.", "warning");
+        return;
+      }
+
+      const index = libros.findIndex(l => String(l.id) === String(libroId));
+      if (index === -1) return;
+
+      const libro = libros[index];
+      const stockAnterior = parseInt(libro.stock || 0);
+
+      let nuevoStock = stockAnterior;
+      if (tipo === "Entrada") {
+        nuevoStock += cant;
+      } else {
+        if (stockAnterior < cant) {
+          showToast(`No es posible realizar una salida mayor que el stock actual (${stockAnterior} uds).`, "danger");
+          return;
+        }
+        nuevoStock -= cant;
+      }
+
+      // Guardar cambio
+      libros[index].stock = nuevoStock;
+      libros[index].estado = nuevoStock > 0 ? "Disponible" : "Agotado";
+      saveLocalStorage("libros", libros);
+
+      // Registrar en historial de movimientos
+      historial.unshift({
+        fecha: new Date().toLocaleString(),
+        libro: libro.titulo,
+        tipo: tipo,
+        cantidad: cant,
+        stockRestante: nuevoStock
+      });
+      // Guardar últimos 10 movimientos
+      if (historial.length > 10) historial.pop();
+      saveLocalStorage("inventarioHistorial", historial);
+
+      showToast(`Ajuste de inventario registrado con éxito (${tipo}: ${cant} uds).`, "success");
+
+      // Refrescar
+      mostrarStockActual();
+      mostrarInventario();
+    }
+
+    // Renderizar existencias, alertas y log
+    function mostrarInventario() {
+      libros = getLocalStorage("libros");
+      historial = getLocalStorage("inventarioHistorial") || [];
+
+      const tbody = document.getElementById("tablaInventario");
+      const listaAlertas = document.getElementById("listaAlertas");
+      const sinAlertas = document.getElementById("sinAlertas");
+      const logContainer = document.getElementById("historialMovimientos");
+
+      tbody.innerHTML = "";
+      listaAlertas.innerHTML = "";
+      logContainer.innerHTML = "";
+
+      let countAlertas = 0;
+
+      // Renderizar tabla
+      libros.forEach(libro => {
+        const stock = parseInt(libro.stock || 0);
+        let stockLabel = `<span>${stock} uds</span>`;
+        let alertBadge = `<span class="badge badge-success">Suficiente</span>`;
+
+        // Regla: si stock < 5, mostrar alerta roja
+        if (stock < 5) {
+          countAlertas++;
+          stockLabel = `<span style="color: var(--danger); font-weight:700;">${stock} uds</span>`;
+          alertBadge = `<span class="badge badge-low-stock">Bajo Stock</span>`;
+
+          // Añadir a lista de alertas
+          listaAlertas.innerHTML += `
+            <li style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 6px; font-size:0.85rem;">
+              <span style="font-weight:600;">${libro.titulo}</span>
+              <strong style="color: var(--danger);">${stock === 0 ? 'Agotado' : stock + ' uds'}</strong>
+            </li>
+          `;
+        }
+
+        const estadoClase = stock > 0 ? "badge-success" : "badge-muted";
+        const estadoTexto = stock > 0 ? "Disponible" : "Agotado";
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${libro.id}</td>
+            <td style="font-weight:600;">${libro.titulo}</td>
+            <td><code>${libro.isbn}</code></td>
+            <td>${libro.categoria || 'Sin Categoría'}</td>
+            <td>$${parseFloat(libro.precio).toFixed(2)}</td>
+            <td>${stockLabel}</td>
+            <td><span class="badge ${estadoClase}">${estadoTexto}</span></td>
+            <td style="text-align: center;">${alertBadge}</td>
+          </tr>
+        `;
+      });
+
+      // Si no hay alertas
+      if (countAlertas === 0) {
+        sinAlertas.style.display = "block";
+      } else {
+        sinAlertas.style.display = "none";
+      }
+
+      // Renderizar log de movimientos
+      if (historial.length === 0) {
+        logContainer.innerHTML = `<div class="empty-state" style="padding: 10px 0;"><p class="empty-state-text" style="font-size:0.85rem;">No se han registrado movimientos de inventario manuales.</p></div>`;
+      } else {
+        historial.forEach(h => {
+          const badgeClase = h.tipo === "Entrada" ? "log-badge-in" : "log-badge-out";
+          logContainer.innerHTML += `
+            <div class="log-item">
+              <div>
+                <span class="log-badge ${badgeClase}">${h.tipo === "Entrada" ? 'ENTRADA' : 'SALIDA'}</span>
+                <span style="font-weight:600; margin-left: 10px;">${h.libro}</span>
+                <span style="color: var(--text-muted); margin-left: 10px;">x${h.cantidad} uds</span>
+              </div>
+              <div style="font-size:0.8rem; color: var(--text-muted);">
+                ${h.fecha} | Stock restante: <strong>${h.stockRestante}</strong>
+              </div>
+            </div>
+          `;
+        });
+      }
+    }
+    
+    // Adaptar responsividad de alerta
+    if (window.innerWidth <= 768) {
+      document.getElementById("inventarioRow").style.gridTemplateColumns = "1fr";
+    }
+  </script>
+</body>
+</html>

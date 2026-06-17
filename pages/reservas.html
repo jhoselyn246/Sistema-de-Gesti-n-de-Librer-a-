@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestión de Reservas de libros en BookStore. Permite apartar libros y gestionar estados de entrega.">
+  <title>Reservas - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title">Gestión de Reservas</h1>
+        <p class="section-subtitle">Gestiona libros apartados por clientes que no están disponibles o para entrega posterior.</p>
+      </header>
+
+      <!-- Panel de Registro de Reserva -->
+      <section class="form-panel">
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 15px;">Registrar Nueva Reserva</h2>
+        <div class="form-row">
+          <div class="form-group" style="min-width: 220px;">
+            <label for="selectCliente">Cliente</label>
+            <select id="selectCliente" class="form-select">
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group" style="min-width: 250px;">
+            <label for="selectLibro">Libro a Reservar</label>
+            <select id="selectLibro" class="form-select">
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group" style="min-width: 180px;">
+            <label for="fechaReserva">Fecha de Reserva</label>
+            <input type="date" id="fechaReserva" class="form-input">
+          </div>
+
+          <button class="btn btn-primary" onclick="agregarReserva()" id="btnAgregarReserva" style="height: 42px;">
+            <span></span> Reservar Libro
+          </button>
+        </div>
+      </section>
+
+      <!-- Barra de Filtros y Búsqueda -->
+      <section class="filter-bar">
+        <div class="search-input-wrapper">
+          <input type="text" id="buscarReserva" class="form-input" placeholder="Buscar reservas por cliente o título del libro..." oninput="mostrarReservas()">
+        </div>
+      </section>
+
+      <!-- Tabla de Reservas -->
+      <section>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID Reserva</th>
+                  <th>Cliente</th>
+                  <th>Libro</th>
+                  <th>Fecha Reserva</th>
+                  <th>Estado (Cambiar inline)</th>
+                  <th style="text-align: center;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tablaReservas">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="sinReservas" class="empty-state" style="display: none;">
+          <span class="empty-state-icon"></span>
+          <p class="empty-state-text">No se encontraron reservas registradas en el sistema.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/reservas.js"></script>
+</body>
+</html>

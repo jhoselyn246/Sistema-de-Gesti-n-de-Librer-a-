@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestión de Categorías literarias en BookStore. Define los géneros de tus libros.">
+  <title>Categorías - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title"> Gestión de Categorías</h1>
+        <p class="section-subtitle">Administra los géneros y clasificaciones de los libros de tu inventario.</p>
+      </header>
+
+      <!-- Panel de Registro -->
+      <section class="form-panel">
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 15px;">Registrar Categoría</h2>
+        <div class="form-row">
+          <div class="form-group" style="flex: 2;">
+            <label for="nombreCategoria">Nombre de la Categoría</label>
+            <input type="text" id="nombreCategoria" class="form-input" placeholder="Ej. Novela, Ciencia Ficción, Historia, Tecnología..." autocomplete="off">
+          </div>
+
+          <button class="btn btn-primary" onclick="agregarCategoria()" id="btnAgregarCategoria" style="height: 42px;">
+            <span></span> Registrar Categoría
+          </button>
+        </div>
+      </section>
+
+      <!-- Barra de Filtros y Búsqueda -->
+      <section class="filter-bar">
+        <div class="search-input-wrapper">
+          <input type="text" id="buscarCategoria" class="form-input" placeholder="Buscar categoría por nombre..." oninput="mostrarCategorias()">
+        </div>
+      </section>
+
+      <!-- Tabla de Categorías -->
+      <section>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 150px;">ID / Índice</th>
+                  <th>Nombre del Género</th>
+                  <th>Cantidad de Libros Asociados</th>
+                  <th style="text-align: center; width: 150px;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tablaCategorias">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="sinCategorias" class="empty-state" style="display: none;">
+          <span class="empty-state-icon"></span>
+          <p class="empty-state-text">No se encontraron categorías registradas.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/categorias.js"></script>
+</body>
+</html>

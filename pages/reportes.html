@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Reportes y Estadísticas del Sistema BookStore. Analiza ventas por mes, categorías vendidas y clientes frecuentes.">
+  <title>Reportes - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title">Reportes y Analítica</h1>
+        <p class="section-subtitle">Visualiza indicadores financieros, ventas periódicas y comportamiento de clientes frecuentes.</p>
+      </header>
+
+      <!-- Panel de Rango de Fechas -->
+      <section class="form-panel">
+        <h2 class="section-title" style="font-size: 1.15rem; margin-bottom: 12px;">Filtrar Históricos y Reportes</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="filtroPeriodo">Período Predefinido</label>
+            <select id="filtroPeriodo" class="form-select" onchange="cambiarPeriodoPredefinido()">
+              <option value="Todos">Todas las Ventas</option>
+              <option value="Diario">Hoy</option>
+              <option value="Semanal">Últimos 7 días</option>
+              <option value="Mensual">Último mes (30 días)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="fechaInicio">Fecha Inicio</label>
+            <input type="date" id="fechaInicio" class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label for="fechaFin">Fecha Fin</label>
+            <input type="date" id="fechaFin" class="form-input">
+          </div>
+
+          <button class="btn btn-primary" onclick="procesarReportes()" id="btnFiltrarReportes" style="height: 42px;">
+            <span></span> Generar Informe
+          </button>
+        </div>
+      </section>
+
+      <!-- Resumen Estadístico de Ventas y Reservas -->
+      <section class="card-grid">
+        <div class="card card-success stat-card">
+          <div class="stat-info">
+            <h3 id="repTotalRecaudado">Bs 0.00</h3>
+            <p>Total Ingresos</p>
+          </div>
+        </div>
+
+        <div class="card card-primary stat-card">
+          <div class="stat-info">
+            <h3 id="repLibrosVendidos">0</h3>
+            <p>Libros Vendidos</p>
+          </div>
+        </div>
+
+        <div class="card card-secondary stat-card">
+          <div class="stat-info">
+            <h3 id="repClientesActivos">0</h3>
+            <p>Clientes Activos</p>
+          </div>
+        </div>
+
+        <div class="card stat-card" style="border-color: rgba(99,102,241,0.2);">
+          <div class="stat-info">
+            <h3 id="repReservasRealizadas">0</h3>
+            <p>Reservas Realizadas</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cuadrícula de Gráficas Chart.js -->
+      <section class="charts-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+        <div class="chart-container">
+          <h3 class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Ventas Históricas (Bs)</h3>
+          <div style="position: relative; height: 230px; width: 100%;">
+            <canvas id="canvasVentasTiempo"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <h3 class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Ventas por Categoría </h3>
+          <div style="position: relative; height: 230px; width: 100%;">
+            <canvas id="canvasCategoriasVentas"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container" style="grid-column: span 1;">
+          <h3 class="section-title" style="font-size: 1.1rem; margin-bottom: 15px;">Clientes Frecuentes (Compras)</h3>
+          <div style="position: relative; height: 230px; width: 100%;">
+            <canvas id="canvasClientesFrecuentes"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Detalle Tabular del Informe Generado -->
+      <section style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+        <!-- Historial de Ventas Filtrado -->
+        <div class="card" style="padding: 20px;">
+          <h3 class="section-title" style="font-size: 1.15rem; margin-bottom: 12px;">Historial de Transacciones Filtradas</h3>
+          <div class="table-responsive">
+            <table class="data-table" style="font-size: 0.85rem;">
+              <thead>
+                <tr>
+                  <th>Venta</th>
+                  <th>Cliente</th>
+                  <th>Libro</th>
+                  <th>Cantidad</th>
+                  <th>Precio Total</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="tablaReporteVentas">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+          <div id="sinVentasReporte" class="empty-state" style="display: none; padding: 20px 0;">
+            <p class="empty-state-text" style="font-size: 0.85rem;">No hay ventas que coincidan con las fechas indicadas.</p>
+          </div>
+        </div>
+
+        <!-- Historial de Reservas Filtrado -->
+        <div class="card" style="padding: 20px;">
+          <h3 class="section-title" style="font-size: 1.15rem; margin-bottom: 12px;">Reservas Registradas en el Período</h3>
+          <div class="table-responsive">
+            <table class="data-table" style="font-size: 0.85rem;">
+              <thead>
+                <tr>
+                  <th>Reserva</th>
+                  <th>Cliente</th>
+                  <th>Libro</th>
+                  <th>Fecha Reserva</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tablaReporteReservas">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+          <div id="sinReservasReporte" class="empty-state" style="display: none; padding: 20px 0;">
+            <p class="empty-state-text" style="font-size: 0.85rem;">No hay reservas registradas en este período.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/reportes.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Inicio de sesión para el Sistema Integral de Gestión BookStore. Administra libros, ventas y reservas.">
+  <title>Acceso - BookStore</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-logo">
+        <span>📖</span> LIBRERIA 
+      </div>
+      <p class="login-subtitle">Sistema de Gestión de Librería</p>
+
+      <form id="loginForm" onsubmit="procesarLogin(event)" style="display: flex; flex-direction: column; gap: 20px; text-align: left;">
+        <div class="form-group">
+          <label for="username">Usuario</label>
+          <input type="text" id="username" class="form-input" placeholder="Introduce tu usuario" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" class="form-input" placeholder="Introduce tu contraseña" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btnLogin" style="width: 100%; margin-top: 10px; height: 46px;">
+          <span></span> Iniciar Sesión
+        </button>
+      </form>
+
+      <div style="margin-top: 20px;">
+        <a href="#" onclick="abrirRecuperar()" style="color: var(--primary-light); text-decoration: none; font-size: 0.85rem; font-weight: 600;">¿Olvidaste tu contraseña?</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal Recuperación de Contraseña -->
+  <div id="modalRecuperacion" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">🔑 Recuperar Contraseña</h3>
+        <button class="modal-close" onclick="cerrarRecuperar()">&times;</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Introduce tu correo electrónico o tu nombre de usuario para enviarte los pasos de restablecimiento de contraseña.</p>
+        <div class="form-group">
+          <label for="recoveryEmail">Correo Electrónico / Usuario</label>
+          <input type="text" id="recoveryEmail" class="form-input" placeholder="ejemplo@correo.com o admin">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarRecuperar()">Cancelar</button>
+        <button class="btn btn-primary" onclick="simularRecuperacion()">Enviar Enlace</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts dinámicos -->
+  <script src="js/common.js" style="display:none;"></script>
+  <!-- Sobrescribimos checkSession en login para evitar bucles de redirección -->
+  <script>
+    // En la página de login no queremos redirección por sesión ausente
+    window.checkSession = function() { return null; };
+  </script>
+  <script src="js/login.js"></script>
+</body>
+</html>

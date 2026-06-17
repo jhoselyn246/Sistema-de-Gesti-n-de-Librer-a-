@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestión de Editoriales en BookStore. Agrega, edita y administra tus distribuidores.">
+  <title>Editoriales - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title">Gestión de Editoriales</h1>
+        <p class="section-subtitle">Registra y administra las firmas editoriales de tus libros.</p>
+      </header>
+
+      <!-- Panel de Registro -->
+      <section class="form-panel">
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 15px;">Registrar Editorial</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre de la Editorial</label>
+            <input type="text" id="nombre" class="form-input" placeholder="Ej. Salamandra" autocomplete="off">
+          </div>
+          
+          <div class="form-group">
+            <label for="pais">País</label>
+            <input type="text" id="pais" class="form-input" placeholder="Ej. España" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="correo">Correo de Contacto</label>
+            <input type="email" id="correo" class="form-input" placeholder="Ej. contacto@editorial.com" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" class="form-input" placeholder="Ej. +34932222222" autocomplete="off">
+          </div>
+
+          <button class="btn btn-primary" onclick="agregarEditorial()" id="btnAgregarEditorial" style="height: 42px;">
+            <span></span> Registrar
+          </button>
+        </div>
+      </section>
+
+      <!-- Barra de Filtros y Búsqueda -->
+      <section class="filter-bar">
+        <div class="search-input-wrapper">
+          <input type="text" id="buscarEditorial" class="form-input" placeholder="Buscar editorial por nombre o país..." oninput="mostrarEditoriales()">
+        </div>
+      </section>
+
+      <!-- Tabla de Editoriales -->
+      <section>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>País</th>
+                  <th>Correo</th>
+                  <th>Teléfono</th>
+                  <th style="text-align: center;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tablaEditoriales">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="sinEditoriales" class="empty-state" style="display: none;">
+          <span class="empty-state-icon"></span>
+          <p class="empty-state-text">No se encontraron editoriales registradas.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal de Edición de Editoriales -->
+  <div id="modalEdicionEditorial" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar Editorial</h3>
+        <button class="modal-close" onclick="cerrarModal()">&times;</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <input type="hidden" id="editIndex">
+        
+        <div class="form-group">
+          <label for="editNombre">Nombre de la Editorial</label>
+          <input type="text" id="editNombre" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label for="editPais">País</label>
+          <input type="text" id="editPais" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="editCorreo">Correo de Contacto</label>
+          <input type="email" id="editCorreo" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="editTelefono">Teléfono</label>
+          <input type="tel" id="editTelefono" class="form-input">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarEdicion()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/editoriales.js"></script>
+</body>
+</html>

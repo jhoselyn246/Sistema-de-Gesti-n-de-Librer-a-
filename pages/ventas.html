@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Registro y control de Ventas en BookStore. Revisa el historial de transacciones y actualiza el stock automáticamente.">
+  <title>Ventas - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title">Registro de Ventas</h1>
+        <p class="section-subtitle">Realiza ventas de libros, asócialas a clientes y actualiza existencias de forma automatizada.</p>
+      </header>
+
+      <!-- Panel de Registro de Venta -->
+      <section class="form-panel">
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 15px;">Registrar Venta</h2>
+        <div class="form-row">
+          <div class="form-group" style="min-width: 200px;">
+            <label for="selectCliente">Cliente</label>
+            <select id="selectCliente" class="form-select">
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group" style="min-width: 250px;">
+            <label for="selectLibro">Libro a Vender</label>
+            <select id="selectLibro" class="form-select" onchange="actualizarPrecioVenta()">
+              <!-- Cargado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group" style="max-width: 110px; min-width: 80px;">
+            <label for="cantidad">Cantidad</label>
+            <input type="number" id="cantidad" class="form-input" min="1" value="1" oninput="actualizarPrecioVenta()">
+          </div>
+
+          <div class="form-group" style="min-width: 150px;">
+            <label for="fechaVenta">Fecha</label>
+            <input type="date" id="fechaVenta" class="form-input">
+          </div>
+
+          <button class="btn btn-success" onclick="agregarVenta()" id="btnAgregarVenta" style="height: 42px;">
+            <span></span> Procesar Venta
+          </button>
+        </div>
+
+        <!-- Indicador de Precios y Existencias en tiempo real -->
+        <div style="margin-top: 15px; padding: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.85rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <span style="color: var(--text-muted);">Stock Disponible:</span> 
+            <strong id="stockDisponibleLabel">0 uds</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Precio Unitario:</span> 
+            <strong id="precioUnitarioLabel">$0.00</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">Total a Pagar:</span> 
+            <strong id="precioTotalLabel" style="font-size: 1.05rem; color: var(--success);">$0.00</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Barra de Filtros y Búsqueda -->
+      <section class="filter-bar">
+        <div class="search-input-wrapper">
+          <input type="text" id="buscarVenta" class="form-input" placeholder="Buscar ventas por cliente o título del libro..." oninput="mostrarVentas()">
+        </div>
+      </section>
+
+      <!-- Historial de Ventas -->
+      <section>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nro Venta</th>
+                  <th>Cliente</th>
+                  <th>Libro</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unitario</th>
+                  <th>Precio Total</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="tablaVentas">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="sinVentas" class="empty-state" style="display: none;">
+          <span class="empty-state-icon"></span>
+          <p class="empty-state-text">No se encontraron ventas registradas en el historial.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/ventas.js"></script>
+</body>
+</html>

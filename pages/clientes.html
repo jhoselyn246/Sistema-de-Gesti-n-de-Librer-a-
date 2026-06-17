@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestión de Clientes en BookStore. Permite el control de datos de compradores, membresías y contacto.">
+  <title>Clientes - BookStore</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- El sidebar se inyectará dinámicamente mediante renderSidebar de common.js -->
+    
+    <main class="main-content">
+      <header class="section-header">
+        <h1 class="section-title"> Gestión de Clientes</h1>
+        <p class="section-subtitle">Administra la información de los clientes registrados para compras y reservas.</p>
+      </header>
+
+      <!-- Panel de Registro -->
+      <section class="form-panel">
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 15px;">Registrar Cliente</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" class="form-input" placeholder="Ej. Juan" autocomplete="off">
+          </div>
+          
+          <div class="form-group">
+            <label for="apellido">Apellido</label>
+            <input type="text" id="apellido" class="form-input" placeholder="Ej. Pérez" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="ci">CI (Cédula)</label>
+            <input type="text" id="ci" class="form-input" placeholder="Ej. 1234567" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" id="telefono" class="form-input" placeholder="Ej. 70012345" autocomplete="off">
+          </div>
+
+          <div class="form-group" style="min-width: 250px;">
+            <label for="correo">Correo Electrónico</label>
+            <input type="email" id="correo" class="form-input" placeholder="Ej. juan@correo.com" autocomplete="off">
+          </div>
+
+          <div class="form-group" style="flex: 2; min-width: 250px;">
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" class="form-input" placeholder="Ej. Calle Aroma No. 15" autocomplete="off">
+          </div>
+
+          <button class="btn btn-primary" onclick="agregarCliente()" id="btnAgregarCliente" style="height: 42px;">
+            <span>➕</span> Registrar
+          </button>
+        </div>
+      </section>
+
+      <!-- Barra de Filtros y Búsqueda -->
+      <section class="filter-bar">
+        <div class="search-input-wrapper">
+          <input type="text" id="buscarCliente" class="form-input" placeholder=" Buscar por nombre, apellido o CI..." oninput="mostrarClientes()">
+        </div>
+      </section>
+
+      <!-- Tabla de Clientes -->
+      <section>
+        <div class="table-wrapper">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre Completo</th>
+                  <th>CI</th>
+                  <th>Teléfono</th>
+                  <th>Correo</th>
+                  <th>Dirección</th>
+                  <th style="text-align: center;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tablaClientes">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="sinClientes" class="empty-state" style="display: none;">
+          <span class="empty-state-icon"></span>
+          <p class="empty-state-text">No se encontraron clientes registrados.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal de Edición de Clientes -->
+  <div id="modalEdicionCliente" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"> Editar Cliente</h3>
+        <button class="modal-close" onclick="cerrarModal()">&times;</button>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <input type="hidden" id="editIndex">
+        
+        <div class="form-group">
+          <label for="editNombre">Nombre</label>
+          <input type="text" id="editNombre" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label for="editApellido">Apellido</label>
+          <input type="text" id="editApellido" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="editCi">CI (Cédula)</label>
+          <input type="text" id="editCi" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="editTelefono">Teléfono</label>
+          <input type="tel" id="editTelefono" class="form-input">
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+          <label for="editCorreo">Correo Electrónico</label>
+          <input type="email" id="editCorreo" class="form-input">
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+          <label for="editDireccion">Dirección</label>
+          <input type="text" id="editDireccion" class="form-input">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="guardarEdicion()">Guardar Cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/clientes.js"></script>
+</body>
+</html>
